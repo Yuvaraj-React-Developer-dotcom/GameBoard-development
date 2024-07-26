@@ -17,6 +17,12 @@ module.exports = {
         exclude: /node_modules/,
         use: "babel-loader",
       },
+      {
+        type: 'javascript/auto',
+        test: /\.json$/,
+        include: /(lottie)/,
+        loader: 'lottie-web-webpack-loader',
+      }
     ],
   },
   resolve: {
