@@ -133,6 +133,10 @@ import dogjson from '../../assets/lottie/dog.json'
 // common 
 import blastJson from '../../assets/lottie/blast.json'
 import fireJson from '../../assets/lottie/fire.json'
+// plant
+import powerPlant from '../../assets/lottie/powerPlant.json'
+
+
 
 
 const GameBoard = () => {
@@ -142,6 +146,8 @@ const GameBoard = () => {
     const [grid, setGrid] = useState([]);
     const [defenders, setDefenders] = useState([]);
     const [attackers, setAttackers] = useState([]);
+    const [update, setUpdate] = useState(0)
+
     const showAnimal = (animalName) => {
         return (
             <Lottie
@@ -149,25 +155,65 @@ const GameBoard = () => {
                 animationData={animalName}
                 play
                 style={{ width: "100%", height: "100%" }}
+            // forceSegments={false}
+            // direction={ -1}
+            // speed={1}
+            // segments={[50, 100]}
+            />
+
+        )
+    }
+
+    const showFire = (fire) => {
+        return (
+            <Lottie
+                loop
+                animationData={fire}
+                play
+                style={{ width: "40%", height: "40%" }}
+            />
+        )
+    }
+    const showPlant = (plant) => {
+        return (
+            <Lottie
+                loop
+                animationData={plant}
+                play
+                style={{ width: "100%", height: "100%" }}
+                segments={[18, 100]}
             />
         )
     }
 
+
+
     const defendersList = useMemo(() => [
-        { emoji: showAnimal(dogjson), power: 1, attackPower: 1, fireEmoji: showAnimal(fireJson) },
-        { emoji: showAnimal(buffaloJson), power: 2, attackPower: 1, fireEmoji: showAnimal(fireJson) },
-        { emoji: showAnimal(duckJson), power: 3, attackPower: 2, fireEmoji: showAnimal(fireJson) },
-        { emoji: showAnimal(donkeyJson), power: 4, attackPower: 2, fireEmoji: showAnimal(fireJson) },
-        { emoji: showAnimal(sevalJson), power: 5, attackPower: 3, fireEmoji: showAnimal(fireJson) }
+        { category: 'defender', emoji: showAnimal(dogjson), defencePower: 10, attackPower: 2, fireEmoji: showFire(fireJson), },
+        { category: 'defender', emoji: showAnimal(buffaloJson), defencePower: 10, attackPower: 2, fireEmoji: showFire(fireJson), },
+        { category: 'defender', emoji: showAnimal(duckJson), defencePower: 10, attackPower: 2, fireEmoji: showFire(fireJson), },
+        { category: 'defender', emoji: showAnimal(donkeyJson), defencePower: 10, attackPower: 2, fireEmoji: showFire(fireJson), },
+        { category: 'defender', emoji: showAnimal(sevalJson), defencePower: 10, attackPower: 2, fireEmoji: showFire(fireJson), }
     ], []);
 
     const attackersList = useMemo(() => [
-        { emoji: showAnimal(gorillaJson), power: 3, blastEmoji: showAnimal(blastJson) },
-        { emoji: showAnimal(kangaruJson), power: 3, blastEmoji: showAnimal(blastJson) },
-        { emoji: showAnimal(dinosaurJson), power: 4, blastEmoji: showAnimal(blastJson) },
-        { emoji: showAnimal(snackJson), power: 5, blastEmoji: showAnimal(blastJson) },
-        { emoji: showAnimal(tigerJson), power: 6, blastEmoji: showAnimal(blastJson) }
+        { category: 'attacker', emoji: showAnimal(gorillaJson), attackPower: 5, defencePower: 10, blastEmoji: showAnimal(blastJson), },
+        { category: 'attacker', emoji: showAnimal(kangaruJson), attackPower: 5, defencePower: 10, blastEmoji: showAnimal(blastJson), },
+        { category: 'attacker', emoji: showAnimal(dinosaurJson), attackPower: 5, defencePower: 10, blastEmoji: showAnimal(blastJson), },
+        { category: 'attacker', emoji: showAnimal(snackJson), attackPower: 5, defencePower: 10, blastEmoji: showAnimal(blastJson), },
+        { category: 'attacker', emoji: showAnimal(tigerJson), attackPower: 5, defencePower: 10, blastEmoji: showAnimal(blastJson), }
     ], []);
+    const powerPlantList = useMemo(() => [
+        { category: 'attacker', emoji: showPlant(powerPlant), powerEnergy: 5, },
+        { category: 'attacker', emoji: showPlant(powerPlant), powerEnergy: 5, },
+        { category: 'attacker', emoji: showPlant(powerPlant), powerEnergy: 5, },
+        { category: 'attacker', emoji: showPlant(powerPlant), powerEnergy: 5 },
+        { category: 'attacker', emoji: showPlant(powerPlant), powerEnergy: 5, }
+    ], []);
+
+    console.log(powerPlantList, 'find powerPlantList')
+
+
 
     useEffect(() => {
         const initialGrid = Array(rows).fill().map(() => Array(cols).fill(''));
@@ -209,9 +255,9 @@ const GameBoard = () => {
             const attackerInCol = attackers.find(attacker => attacker.row === defenderRow && attacker.col === col);
 
             if (attackerInCol) {
-                attackerInCol.power -= defender.attackPower;
+                attackerInCol.defencePower -= defender.attackPower;
 
-                if (attackerInCol.power <= 0) {
+                if (attackerInCol.defencePower <= 0) {
                     const index = attackers.indexOf(attackerInCol);
                     const updatedAttackers = [...attackers];
                     updatedAttackers[index] = { ...attackerInCol, emoji: attackerInCol.blastEmoji };
@@ -246,7 +292,7 @@ const GameBoard = () => {
         }, 1500); // Move attackers every 1.5 seconds
 
         return () => clearInterval(interval);
-    }, [attackers]);
+    }, []);
 
     const handleDefenderClick = (defender) => {
         launchFireEmoji(defender);
@@ -267,19 +313,67 @@ const GameBoard = () => {
 
         setGrid(updatedGrid);
     }, [rows, cols, defenders, attackers]);
+    useEffect(() => {
+        setInterval(() => {
+            setUpdate((prevData) => prevData + 1)
+        }, [500])
+    }, [])
 
     return (
-        <div className="grid grid-cols-10 grid-rows-5 gap-1 p-4">
-            {grid.map((row, rowIndex) => (
-                row.map((col, colIndex) => (
-                    <div key={`${rowIndex}-${colIndex}`} className="w-10 h-10 border border-gray-300 text-center content-center"
-                        onClick={() => handleDefenderClick(defenders.find(defender => defender.row === rowIndex))}>
-                        <div>{grid[rowIndex][colIndex]}</div>
+        <>
+            <div className=''>
+                <div className='h-[10vh] bg-[#508C9B]'></div>
+                <div className='h-[80vh] bg-[#FF8225]'>
+                    <div className='flex h-full'>
+                        <div className="w-[20vw] bg-[#134B70]">
+                            {powerPlantList?.map((plant, plantIndex) => (
+                                <div className='w-full h-[20%]'>
+                                    {plant?.emoji}
+                                </div>
+                            ))}F
+                        </div>
+                        <div className="w-[80vw] bg-[#677D6A]">
+                            <div className="grid grid-cols-10 grid-rows-5 w-[80vw] h-[80vh] bg-[black]">
+                                {grid.map((row, rowIndex) => (
+                                    row.map((col, colIndex) => {
+                                        console.log(defenders[0].category, "Find mapped data")
+
+                                        return (
+                                            <div key={`${rowIndex}-${colIndex}`} className="relative border border-gray-300 text-center content-center"
+                                                onClick={() => { grid[rowIndex][colIndex] ? handleDefenderClick(defenders.find(defender => defender.row === rowIndex)) : () => { } }}>
+                                                <div className="absolute w-[40px] h-[40px] bottom-[0] overflow-hidden"><iframe className="w-full h-full" src="https://lottie.host/embed/0c25cd9d-12cf-413f-b959-52f299358823/RyRU2SW9AQ.json"></iframe></div>
+                                                {grid[rowIndex][colIndex] && (
+                                                    <div className={`flex justify-center ${defenders[colIndex]?.category === "defender" ? "scale-x-[-1]" : ""}`}>
+                                                        {grid[rowIndex][colIndex]}
+                                                    </div>
+                                                )}
+
+
+                                            </div>
+                                        )
+                                    })
+                                ))}
+                            </div>
+                        </div>
+                        <div className="w-[20vw] bg-[#134B70]"></div>
                     </div>
-                ))
-            ))}
-        </div>
+                </div>
+                <div className='h-[10vh] bg-[#508C9B]'></div>
+            </div>
+
+            {/* <div className="grid grid-cols-10 grid-rows-5 gap-1 p-4 w-[80vw] h-[80vh] bg-[red]">
+                {grid.map((row, rowIndex) => (
+                    row.map((col, colIndex) => (
+                        <div key={`${rowIndex}-${colIndex}`} className="w-10 h-10 border border-gray-300 text-center content-center"
+                            onClick={() => handleDefenderClick(defenders.find(defender => defender.row === rowIndex))}>
+                            <div>{grid[rowIndex][colIndex]}</div>
+                        </div>
+                    ))
+                ))}
+            </div> */}
+        </>
     );
+
 };
 
 export default GameBoard;

@@ -5,9 +5,9 @@ import GameBoard from '../GameBoardModule'
 
 const LandingScreen = () => {
   return (
-    <div className='px-4'>
+    <div>
       {/* <HomeScreen /> */}
-      <h1>Defender vs. Attacker Game</h1>
+      {/* <h1>Defender vs. Attacker Game</h1> */}
       <GameBoard/>
     </div>
   )
