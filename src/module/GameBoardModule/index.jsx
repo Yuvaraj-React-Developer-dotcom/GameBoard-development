@@ -286,13 +286,13 @@ const GameBoard = () => {
         setAttackers(updatedAttackers);
     };
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            // moveAttackers();
-        }, 1500); // Move attackers every 1.5 seconds
+    // useEffect(() => {
+    //     // const interval = setInterval(() => {
+    //     //     // moveAttackers();
+    //     // }, 1500); // Move attackers every 1.5 seconds
 
-        return () => clearInterval(interval);
-    }, []);
+    //     // return () => clearInterval(interval);
+    // }, []);
 
     const handleDefenderClick = (defender) => {
         launchFireEmoji(defender);
@@ -313,11 +313,11 @@ const GameBoard = () => {
 
         setGrid(updatedGrid);
     }, [rows, cols, defenders, attackers]);
-    useEffect(() => {
-        setInterval(() => {
-            setUpdate((prevData) => prevData + 1)
-        }, [500])
-    }, [])
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         setUpdate((prevData) => prevData + 1)
+    //     }, [500])
+    // }, [])
 
     return (
         <>
